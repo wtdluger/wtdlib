@@ -134,6 +134,8 @@ def df_am1_5():
     Units are as follows:
         Wavelength: nm
         AM 1.5 Spectral Irradiance: W*m-2*nm-1
+    Data obtained from NREL
+    https://www.nrel.gov/grid/solar-resource/spectra-am1.5.html
     """
     file_loc = Path(__file__).parent.joinpath('standards_cie', 'AM1.5G.xlsx')
     wb = 'ASTM G-173-03 AM1.5'
