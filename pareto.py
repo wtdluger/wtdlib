@@ -136,7 +136,7 @@ def generate_pareto_chart_detailed(
     return fig
 
 def generate_pareto_chart(
-        df, pareto='pareto', subpareto='subpareto', count='frequency', 
+        df, pareto='pareto', subpareto=False, count='frequency', 
         style_name='seaborn-v0_8', x_label_rotation=0, dpi=175):
 
     """
@@ -154,7 +154,7 @@ def generate_pareto_chart(
     Parameters:
         pareto: default 'pareto'.  This is the pareto/defect column 
         described above (1).
-        subpareto: default 'subpareto'.  This is the subpareto column
+        subpareto: default False.  This is the subpareto column
         described above (2).
         count: default 'frequency'. This is the number of defects for
         each pareto described above (3)
