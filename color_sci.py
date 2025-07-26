@@ -170,3 +170,45 @@ def returnCCT(arr):
     n = (xyY_light[0] - 0.3320) / (xyY_light[1] - 0.1858)
     cct = 449*n**3 + 3525*n**2 + 6823.3*n + 5520.33
     return cct
+
+
+def returnCRI(df_measured, show_work=False):
+    """
+    Returns the Color Rendering Index of a light source, and optionally a
+    dataframe of the Ri values.
+    Takes a DataFrame input of L*a*b* color measurements of each of the
+    Test Color Sample standards for determining CRI.  Columns of the dataframe
+    must be as follows: 'Test Color Sample', 'L*', 'a*', 'b*'. 
+    Test Color Sample' names must be: 'TCS01', 'TCS02', 'TCS03', 'TCS04', 
+    'TCS05', 'TCS06', 'TCS07', 'TCS08', 'TCS09', 'TCS10', 'TCS11', 'TCS12', 
+    'TCS13', 'TCS14','TCS15'.
+
+    parameter: 
+    show_work: default False.  If False, function only returns the CRI value.
+    If True, function returns the CRI value and a dataframe of the Ri values.
+    
+    
+    Data Obtained From: 
+    https://www.waveformlighting.com/tech/cri-ra-test-color-samples-tcs
+    """
+    cri_path = Path(__file__).parent.joinpath('standards_cie', 'CRI_TCS.xlsx')
+    df_cri = pd.read_excel(cri_path)
+    df_cri[['L*', 'a*', 'b*']] = ski.color.rgb2lab(
+        df_cri[['R','G','B']] / 255.0, illuminant='D65', observer='10'
+    )
+
+    dfR = pd.merge(
+        df_cri[['Test Color Sample', 'L*','a*','b*']], df_measured,
+        how='inner', on='Test Color Sample', suffixes=('_cri', '_test')
+    )
+    dfR['dL*'] = dfR['L*_cri'] - dfR['L*_test']
+    dfR['da*'] = dfR['a*_cri'] - dfR['a*_test']
+    dfR['db*'] = dfR['b*_cri'] - dfR['b*_test']
+    dfR['dE'] = np.sqrt(dfR['dL*']**2 + dfR['da*']**2 + dfR['db*']**2)
+    dfR['R'] = 100 - 4.6*dfR['dE']
+    cri = float(dfR['R'].mean())
+    
+    if show_work:
+        return cri, dfR
+    else:
+        return cri
