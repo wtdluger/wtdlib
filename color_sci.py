@@ -148,3 +148,25 @@ def df_am1_5():
         'Direct+circumsolar W*m-2*nm-1':'AM 1.5D'
     })
     return df_am
+
+def returnCCT(arr):
+    """
+    Takes an input color value (either XYZ or xy color), 
+    and returns the CCT value as calculated using McCamy’s Approximation.
+    Due to conversion to xyY color, XYZ can be in either 0-1 or 0-100 scale.
+
+    Common XYZ values:
+    AM1.5G: np.array([155.564, 160.315, 152.232])
+    D65: 100*ski.color.xyz_tristimulus_values(illuminant="D65", observer="10")
+    """
+    if (arr.shape[0] == 3):
+        xyz_light = arr.copy()
+        xyY_light = xyz_light/xyz_light.sum()
+    elif (arr.shape[0] == 2):
+        xyY_light = arr.copy()
+    else:
+        xyY_light = np.array([-1, -1, -1])
+    
+    n = (xyY_light[0] - 0.3320) / (xyY_light[1] - 0.1858)
+    cct = 449*n**3 + 3525*n**2 + 6823.3*n + 5520.33
+    return cct
